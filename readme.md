@@ -4,7 +4,7 @@
 - clone or download
 - npm i
 - env setup 
-- run (nodemon start)
+- run (nodemon start or nodemon index.js)
 
 ## usages packages 
 - express 
