@@ -25,35 +25,36 @@ async function run() {
     const productsCol = database.collection("products");
 
     // // search kore deki
-    app.get('/some-products', async(req, res)=>{
+    app.get("/some-products", async (req, res) => {
       try {
         const { productName } = req.query;
         let query = {};
 
         if (productName) {
           // Using $regex for case-insensitive and partial match search
-          query.productName = { $regex: productName, $options: 'i' };
+          query.productName = { $regex: productName, $options: "i" };
         }
         // Find products that match the query and sort them
-        const products =await productsCol.find(query).toArray();
+        const products = await productsCol.find(query).toArray();
         res.json(products);
-
       } catch (error) {
-        console.error('Error fetching products:', error);
-        res.status(500).json({ message: 'Server error' });
+        console.error("Error fetching products:", error);
+        res.status(500).json({ message: "Server error" });
       }
-    })
+    });
 
     // All products get
     app.get("/products", async (req, res) => {
       try {
-        const {sort } = req.query;
-        let sortOption = {};   
+        const { sort } = req.query;
+        let sortOption = {};
 
-        if (sort === "lowhigh") {          
+        if (sort === "lowhigh") {
           sortOption.price = 1; // Ascending order
         } else if (sort === "highlow") {
           sortOption.price = -1; // Descending order
+        } else if (sort === "newest") {
+          sortOption.productCreationDateTime = -1; // Newest first (descending order by date)
         } else if (sort === "") {
           const result = await productsCol.find().toArray();
           res.status(200).send({
@@ -64,10 +65,7 @@ async function run() {
         } else {
           sortOption = {};
         }
-        const products = await productsCol
-          .find()
-          .sort(sortOption)
-          .toArray();
+        const products = await productsCol.find().sort(sortOption).toArray();
         res.json(products);
       } catch (error) {
         res.status(500).send({
