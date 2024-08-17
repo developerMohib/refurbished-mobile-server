@@ -33,6 +33,7 @@ async function run() {
         // pagination query
         const page = parseInt(req.query.page);
         const size = parseInt(req.query.size);
+        const offset = (page - 1) * size;
         console.log("34 query page ", page, "query size ", size);
 
         let sortOption = {};
@@ -64,7 +65,7 @@ async function run() {
         const products = await productsCol
           .find(query)
           .sort(sortOption)
-          .skip(page * size)
+          .skip(offset)
           .limit(size)
           .toArray();
         res.json(products);
