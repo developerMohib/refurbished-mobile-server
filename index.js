@@ -76,6 +76,25 @@ async function run() {
       }
     });
 
+    // show per page 
+    app.get('/productpage', async(req, res)=>{
+      try {
+        const page = parseInt(req.query.page);
+        const size = parseInt(req.query.size);
+        // Find products that match the query and sort them
+        const products = await productsCol.find().skip(page * size).limit(size).toArray();
+        res.send(products);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        res.status(500).json({ message: "Server error" });
+      }
+    })
+
+    app.get('/productCount', async (req, res)=> {
+      const count = await productsCol.estimatedDocumentCount();
+      res.send({count})
+    })
+
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
