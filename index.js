@@ -24,31 +24,27 @@ async function run() {
     const database = client.db("Refurbished");
     const productsCol = database.collection("products");
 
-    // // search kore deki
-    app.get("/some-products", async (req, res) => {
+    // All products get
+    app.get("/products", async (req, res) => {
       try {
-        const { productName } = req.query;
+        console.log("all query ", req.query);
+        const { sort, productName } = req.query;
+
+        // pagination query
+        const page = parseInt(req.query.page);
+        const size = parseInt(req.query.size);
+        console.log("34 query page ", page, "query size ", size);
+
+        let sortOption = {};
         let query = {};
 
+        // Search Product
         if (productName) {
           // Using $regex for case-insensitive and partial match search
           query.productName = { $regex: productName, $options: "i" };
         }
-        // Find products that match the query and sort them
-        const products = await productsCol.find(query).toArray();
-        res.json(products);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        res.status(500).json({ message: "Server error" });
-      }
-    });
 
-    // All products get
-    app.get("/products", async (req, res) => {
-      try {
-        const { sort } = req.query;
-        let sortOption = {};
-
+        // sorting newest, high to low, low to high
         if (sort === "lowhigh") {
           sortOption.price = 1; // Ascending order
         } else if (sort === "highlow") {
@@ -65,7 +61,12 @@ async function run() {
         } else {
           sortOption = {};
         }
-        const products = await productsCol.find().sort(sortOption).toArray();
+        const products = await productsCol
+          .find(query)
+          .sort(sortOption)
+          .skip(page * size)
+          .limit(size)
+          .toArray();
         res.json(products);
       } catch (error) {
         res.status(500).send({
@@ -76,24 +77,10 @@ async function run() {
       }
     });
 
-    // show per page 
-    app.get('/productpage', async(req, res)=>{
-      try {
-        const page = parseInt(req.query.page);
-        const size = parseInt(req.query.size);
-        // Find products that match the query and sort them
-        const products = await productsCol.find().skip(page * size).limit(size).toArray();
-        res.send(products);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        res.status(500).json({ message: "Server error" });
-      }
-    })
-
-    app.get('/productCount', async (req, res)=> {
+    app.get("/productCount", async (req, res) => {
       const count = await productsCol.estimatedDocumentCount();
-      res.send({count})
-    })
+      res.send({ count });
+    });
 
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
