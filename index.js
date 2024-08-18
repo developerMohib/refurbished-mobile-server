@@ -26,14 +26,13 @@ async function run() {
     // Route to get products with filtering, sorting, and pagination
     app.get("/products", async (req, res) => {
       try {
-        console.log("all query ", req.query);
-        const { sort, productName, category, brand, pricRange } = req.query;
-
+        const { sort, productName, category = '', brand, price } = req.query;
+        
         // Pagination query
         const page = parseInt(req.query.page) || 1;
         const size = parseInt(req.query.size) || 3;
         const offset = (page - 1) * size;
-        console.log("query page ", page, "query size ", size);
+        // console.log("query page ", page, "query size ", size);
 
         let sortOption = {};
         let query = {};
@@ -41,7 +40,7 @@ async function run() {
         // Filter products
         if (category) query.category = category;
         if (brand) query.brand = brand;
-        if (pricRange) query.price = { $lte: parseFloat(pricRange) };
+        if (price) query.price = { $lte: Number(price) };
 
         // Search Product
         if (productName) {
@@ -56,7 +55,7 @@ async function run() {
         } else if (sort === "newest") {
           sortOption.productCreationDateTime = -1; // Newest first (descending order by date)
         }
-
+        console.log('59 query', query)
         // Fetch products
         const products = await productsCol
           .find(query)
@@ -64,8 +63,8 @@ async function run() {
           .skip(offset)
           .limit(size)
           .toArray();
+          res.json(products);
 
-          
       } catch (error) {
         res.status(500).send({
           success: false,
