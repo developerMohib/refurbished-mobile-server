@@ -4,7 +4,7 @@ const app = express();
 require("dotenv").config();
 const port = process.env.PORT || 8000;
 
-// middle-wares
+// middlewares
 app.use(cors());
 app.use(express.json());
 
@@ -18,57 +18,54 @@ const client = new MongoClient(uri, {
   },
 });
 
-//https://refurbished-mobile-server.vercel.app/
 async function run() {
   try {
     const database = client.db("Refurbished");
     const productsCol = database.collection("products");
 
-    // All products get
+    // Route to get products with filtering, sorting, and pagination
     app.get("/products", async (req, res) => {
       try {
         console.log("all query ", req.query);
-        const { sort, productName } = req.query;
+        const { sort, productName, category, brand, pricRange } = req.query;
 
-        // pagination query
-        const page = parseInt(req.query.page);
-        const size = parseInt(req.query.size);
+        // Pagination query
+        const page = parseInt(req.query.page) || 1;
+        const size = parseInt(req.query.size) || 3;
         const offset = (page - 1) * size;
-        console.log("34 query page ", page, "query size ", size);
+        console.log("query page ", page, "query size ", size);
 
         let sortOption = {};
         let query = {};
 
+        // Filter products
+        if (category) query.category = category;
+        if (brand) query.brand = brand;
+        if (pricRange) query.price = { $lte: parseFloat(pricRange) };
+
         // Search Product
         if (productName) {
-          // Using $regex for case-insensitive and partial match search
           query.productName = { $regex: productName, $options: "i" };
         }
 
-        // sorting newest, high to low, low to high
+        // Sorting
         if (sort === "lowhigh") {
           sortOption.price = 1; // Ascending order
         } else if (sort === "highlow") {
           sortOption.price = -1; // Descending order
         } else if (sort === "newest") {
           sortOption.productCreationDateTime = -1; // Newest first (descending order by date)
-        } else if (sort === "") {
-          const result = await productsCol.find().toArray();
-          res.status(200).send({
-            success: true,
-            message: "Products retrieved successfully",
-            data: result,
-          });
-        } else {
-          sortOption = {};
         }
+
+        // Fetch products
         const products = await productsCol
           .find(query)
           .sort(sortOption)
           .skip(offset)
           .limit(size)
           .toArray();
-        res.json(products);
+
+          
       } catch (error) {
         res.status(500).send({
           success: false,
@@ -78,21 +75,32 @@ async function run() {
       }
     });
 
+    // Route to get the total product count
     app.get("/productCount", async (req, res) => {
-      const count = await productsCol.estimatedDocumentCount();
-      res.send({ count });
+      try {
+        const count = await productsCol.estimatedDocumentCount();
+        res.send({ count });
+      } catch (error) {
+        res.status(500).send({
+          success: false,
+          message: "Failed to retrieve product count",
+          error: error.message,
+        });
+      }
     });
 
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
-  } finally {
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+  } catch (error) {
+    console.error("Error connecting to MongoDB:", error);
   }
 }
+
 run().catch(console.dir);
+
 app.get("/", (req, res) => {
-  res.send("Refurbished product server is running !! ");
+  res.send("Refurbished product server is running!");
 });
+
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`Server listening on port ${port}`);
 });
