@@ -26,11 +26,12 @@ async function run() {
     // Route to get products with filtering, sorting, and pagination
     app.get("/products", async (req, res) => {
       try {
+        console.log('all query ',req.query)
         const { sort, productName, category = '', brand, price } = req.query;
-        
+
         // Pagination query
         const page = parseInt(req.query.page) || 1;
-        const size = parseInt(req.query.size) || 3;
+        const size = parseInt(req.query.size) || 6;
         const offset = (page - 1) * size;
         // console.log("query page ", page, "query size ", size);
 

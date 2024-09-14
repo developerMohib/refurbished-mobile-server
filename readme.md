@@ -11,8 +11,8 @@ This repository contains the backend server for the Product Management Applicati
  **Clone the Repository**
 
    ```bash
-   git clone https://github.com/FARUK2059/BestDeal-Server.git
-   cd BestDeal-Server
+   git clone https://github.com/developerMohib/refurbished-mobile-server.git
+   cd refurbished-mobile-server
    
 - npm i
 - env setup 
