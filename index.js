@@ -25,15 +25,14 @@ async function run() {
 
     // Route to get products with filtering, sorting, and pagination
     app.get("/products", async (req, res) => {
+      console.log('28', req?.query)
       try {
-        console.log('all query ',req.query)
-        const { sort, productName, category = '', brand, price } = req.query;
+        const { sort, productName, category = '', brand, price } = req?.query;
 
         // Pagination query
-        const page = parseInt(req.query.page) || 1;
-        const size = parseInt(req.query.size) || 6;
+        const page = parseInt(req?.query?.page) || 1;
+        const size = parseInt(req?.query?.size) || 6;
         const offset = (page - 1) * size;
-        // console.log("query page ", page, "query size ", size);
 
         let sortOption = {};
         let query = {};
@@ -56,7 +55,6 @@ async function run() {
         } else if (sort === "newest") {
           sortOption.productCreationDateTime = -1; // Newest first (descending order by date)
         }
-        console.log('59 query', query)
         // Fetch products
         const products = await productsCol
           .find(query)
@@ -98,7 +96,7 @@ async function run() {
 run().catch(console.dir);
 
 app.get("/", (req, res) => {
-  res.send("Refurbished product server is running!");
+  res.send("refurbished product server is running!");
 });
 
 app.listen(port, () => {
