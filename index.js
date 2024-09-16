@@ -25,7 +25,6 @@ async function run() {
 
     // Route to get products with filtering, sorting, and pagination
     app.get("/products", async (req, res) => {
-      console.log('28', req?.query)
       try {
         const { sort, productName, category = '', brand, price } = req?.query;
 
