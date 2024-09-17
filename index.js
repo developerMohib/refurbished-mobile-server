@@ -26,11 +26,11 @@ async function run() {
     // Route to get products with filtering, sorting, and pagination
     app.get("/products", async (req, res) => {
       try {
-        const { sort, productName, category = '', brand, price } = req?.query;
-
+        const {sort, productName, category = '', brand, price } = req?.query;
+console.log('productName 30', productName)
         // Pagination query
         const page = parseInt(req?.query?.page) || 1;
-        const size = parseInt(req?.query?.size) || 6;
+        const size = parseInt(req?.query?.size) || 8;
         const offset = (page - 1) * size;
 
         let sortOption = {};
@@ -52,7 +52,7 @@ async function run() {
         } else if (sort === "highlow") {
           sortOption.price = -1; // Descending order
         } else if (sort === "newest") {
-          sortOption.productCreationDateTime = -1; // Newest first (descending order by date)
+          sortOption.productCreationDateTime = -1;
         }
         // Fetch products
         const products = await productsCol
@@ -71,6 +71,22 @@ async function run() {
         });
       }
     });
+
+    app.get('/new-phone', async (req, res) =>{
+      const data = req.query ;
+      console.log('77 data', data)
+      try {
+        const result = await productsCol.find().toArray();
+        res.send(result)
+
+      } catch (error) {
+        res.status(500).send({
+          success : false,
+          message : "Failed to retrive products",
+          error : error.message
+        })
+      }
+    })
 
     // Route to get the total product count
     app.get("/productCount", async (req, res) => {
