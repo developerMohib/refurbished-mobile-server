@@ -26,8 +26,7 @@ async function run() {
     // Route to get products with filtering, sorting, and pagination
     app.get("/products", async (req, res) => {
       try {
-        const {sort, productName, category = '', brand, price } = req?.query;
-console.log('productName 30', productName)
+        const { sort, productName, category = "", brand, price } = req?.query;
         // Pagination query
         const page = parseInt(req?.query?.page) || 1;
         const size = parseInt(req?.query?.size) || 8;
@@ -61,8 +60,7 @@ console.log('productName 30', productName)
           .skip(offset)
           .limit(size)
           .toArray();
-          res.json(products);
-
+        res.json(products);
       } catch (error) {
         res.status(500).send({
           success: false,
@@ -72,21 +70,20 @@ console.log('productName 30', productName)
       }
     });
 
-    app.get('/new-phone', async (req, res) =>{
-      const data = req.query ;
-      console.log('77 data', data)
+    app.get("/new-phone", async (req, res) => {
+      const data = req.query;
+      console.log("77 data", data);
       try {
         const result = await productsCol.find().toArray();
-        res.send(result)
-
+        res.send(result);
       } catch (error) {
         res.status(500).send({
-          success : false,
-          message : "Failed to retrive products",
-          error : error.message
-        })
+          success: false,
+          message: "Failed to retrive products",
+          error: error.message,
+        });
       }
-    })
+    });
 
     // Route to get the total product count
     app.get("/productCount", async (req, res) => {
@@ -102,7 +99,9 @@ console.log('productName 30', productName)
       }
     });
 
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!"
+    );
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
   }
