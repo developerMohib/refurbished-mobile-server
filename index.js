@@ -27,7 +27,6 @@ async function run() {
     app.get("/products", async (req, res) => {
       try {
         const { sort, productName, category = "", brand = " ", price=" " } = req?.query;
-        console.log('30 query', req.query)
         // Pagination query
         const page = parseInt(req?.query?.page) || 1;
         const size = parseInt(req?.query?.size) || 8;
