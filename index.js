@@ -72,7 +72,6 @@ async function run() {
 
     app.get("/new-phone", async (req, res) => {
       const data = req.query;
-      console.log("77 data", data);
       try {
         const result = await productsCol.find().toArray();
         res.send(result);
@@ -100,7 +99,7 @@ async function run() {
     });
 
     console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
+      "successfully connected to MongoDB !"
     );
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
@@ -114,5 +113,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+  console.log(`refurbished server listening on port ${port}`);
 });
